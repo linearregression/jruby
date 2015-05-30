@@ -71,6 +71,15 @@ class TestDir < Test::Unit::TestCase
     assert_equal(['.', '..', "file1", "file2"], files.sort)
   end
 
+  def test_entries_via_uri_classloader
+    jar_file = File.expand_path('../jar_with_relative_require1.jar', __FILE__)
+    $CLASSPATH << jar_file
+    jar_path = "uri:classloader:/test"
+    dir = Dir.new(jar_path)
+    assert dir.entries.include?('require_relative1.rb'), "#{jar_path} does not contain require_relative1.rb: #{dir.entries.inspect}"
+    assert dir.entries.include?('check_versions.sh'), "#{jar_path} does not contain require_relative1.rb: #{dir.entries.inspect}"
+  end
+  
   def test_bogus_glob
     # Test unescaped special char that is meant to be used with another
     # (i.e. bogus glob pattern)
